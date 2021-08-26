@@ -21,10 +21,15 @@ class ArticleFactory extends Factory
      */
     public function definition()
     {
+        $description = '';
+        for ($i = 0; $i < 5; $i++) {
+            $description .= '<p class="mb-4">'.$this->faker->sentences(rand(5, 10), true).'</p>';
+        }
+
         return [
-            'name' => $this->faker->sentence(rand(1, 15)),
+            'title' => $this->faker->sentence(rand(5, 10)),
             'image' => '1.jpg',
-            'description' => $this->faker->realText(rand(300, 1500)),
+            'description' => $description,
             'is_active' => rand(0, 1)
         ];
     }

@@ -11,7 +11,7 @@ class Article extends Model
 
     protected $fillable = [
         'id',
-        'name',
+        'title',
         'image',
         'description',
         'is_active',
@@ -20,7 +20,7 @@ class Article extends Model
     ];
 
     protected $casts = [
-        'name' => 'string',
+        'title' => 'string',
         'image' => 'string',
         'description' => 'string',
         'is_active' => 'boolean'

@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ArticlesController;
+use App\Http\Controllers\IndexController;
+use App\Http\Controllers\Admin\ArticlesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,14 +15,18 @@ use App\Http\Controllers\ArticlesController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [IndexController::class, 'index'])->name('home');
+Route::get('/articles/{article}', [IndexController::class, 'show'])->name('articles.show');
+
+// Route::resource('articles', ArticlesController::class);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [ArticlesController::class, 'index'])->name('dashboard');
 });
 
-Route::resource('articles', ArticlesController::class);
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
