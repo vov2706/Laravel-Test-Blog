@@ -18,7 +18,7 @@ class CreateArticlesTable extends Migration
             $table->string('title');
             $table->string('image');
             $table->text('description');
-            $table->tinyInteger('is_active');
+            $table->tinyInteger('is_active')->default(0);
             $table->timestamps();
         });
     }

@@ -21,6 +21,6 @@ class IndexController extends Controller
     {
         $article = Article::findOrFail($id);
 
-        return view('home.article_show', compact('article'));
+        return view('articles.show', compact('article'));
     }
 }

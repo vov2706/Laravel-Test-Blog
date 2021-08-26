@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\Admin\ArticlesController;
+use App\Http\Controllers\Admin\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,13 +21,12 @@ Route::get('/articles/{article}', [IndexController::class, 'show'])->name('artic
 
 // Route::resource('articles', ArticlesController::class);
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [ArticlesController::class, 'index'])->name('dashboard');
+Route::middleware(['auth'])->prefix('dashboard')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+    Route::resource('articles', ArticlesController::class)->except('show');
 });
 
 
 require __DIR__.'/auth.php';
 
 Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

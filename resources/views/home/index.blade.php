@@ -18,7 +18,7 @@
                             </div>
                             <div class="col-md-7">
                                 <div class="card-body float-left">
-                                    <a href="{{ route('articles.show', ['article' => $article->id]) }}">
+                                    <a href="{{ route('articles.show', ['article' => $article]) }}">
                                         <h5 class="card-title" style="font-size: 2em">{{ $article->title }}</h5>
                                     </a>
                                     <p class="card-text">

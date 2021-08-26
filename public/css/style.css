@@ -6,7 +6,7 @@ body {
 }
 
 .nav-link {
-    font-size: 2.6em;
+    font-size: 2.2em;
 }
 
 .navbar {
@@ -24,4 +24,96 @@ body {
     height: auto;
     padding: 25px;
     font-size: 1.4em;
+}
+
+.fa-check {
+    font-size: 1.5em;
+    color:#39bd4f;
+}
+
+.fa-times-circle {
+    font-size: 1.5em;
+    color:#d00707;
+}
+
+.content-header h1 {
+    font-size: 2.4rem;
+}
+
+.dataTables_length, .dataTables_filter label {
+    font-size: 1.8em;
+}
+
+.articles_filter label {
+    font-size: 1.5em;
+}
+
+.dataTables_info {
+    font-size: 1.8em;
+}
+
+.pagination {
+    font-size: 1.6em;
+}
+
+.text-info {
+    transition: .5s all;
+}
+
+.text-info:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-item {
+    font-size: 1.4em;
+}
+
+/************************
+    Form elements
+***************************/
+
+form {
+    font-size: 1.5em;
+}
+
+form label{
+    font-size: 1.5rem;
+}
+
+.form-elem {
+    font-size: 1.4em;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+}
+
+form button {
+    width: 130px;
+    height: 60px;
+}
+
+.btn {
+    font-size: 1.4em;
+}
+
+/***************
+    Table elements
+****************/
+
+thead {
+    border-bottom: .5px solid rgb(182, 180, 180);
+}
+
+th {
+    font-size: 2.2em;
+}
+
+tbody {
+    font-size: 1.8em;
+}
+
+tbody tr {
+    border-bottom: .5px solid rgb(221, 221, 221);
 }
