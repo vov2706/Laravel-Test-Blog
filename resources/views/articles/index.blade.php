@@ -23,7 +23,7 @@
                 @foreach($articles as $article)
                     <tr>
                         <td>
-                            <img src="/images/{{ $article->image }}"
+                            <img src="/images/{{ json_decode($article->image)->mini }}"
                                 alt="Article image"
                                 width="100"
                                 height="75"

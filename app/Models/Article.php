@@ -21,7 +21,6 @@ class Article extends Model
 
     protected $casts = [
         'title' => 'string',
-        'image' => 'string',
         'description' => 'string',
         'is_active' => 'boolean'
     ];

@@ -21,6 +21,7 @@ body {
 
 .article-show-content {
     background-color: #fff;
+    min-height: 700px;
     height: auto;
     padding: 25px;
     font-size: 1.4em;

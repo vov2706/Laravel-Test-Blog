@@ -26,9 +26,15 @@ class ArticleFactory extends Factory
             $description .= '<p class="mb-4">'.$this->faker->sentences(rand(5, 10), true).'</p>';
         }
 
+        $img = new \stdClass;
+
+        $img->mini = '1_mini.jpg';
+        $img->max = '1_max.jpg';
+        $img->path = '1.jpg';
+
         return [
             'title' => $this->faker->sentence(rand(5, 10)),
-            'image' => '1.jpg',
+            'image' => json_encode($img),
             'description' => $description,
             'is_active' => rand(0, 1)
         ];

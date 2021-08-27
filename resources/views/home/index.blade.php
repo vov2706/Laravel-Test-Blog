@@ -10,12 +10,13 @@
                         <div class="row g-0">
                             <div class="col-md-5">
                                 <img
-                                    src="/images/{{$article->image}}" 
+                                    src="/images/{{json_decode($article->image)->path}}" 
                                     alt="Article image"
                                     class="img-fluid"
                                     width="350"
                                 />
                             </div>
+                            <!-- <p>{{gettype($article->image)}}</p> -->
                             <div class="col-md-7">
                                 <div class="card-body float-left">
                                     <a href="{{ route('articles.show', ['article' => $article]) }}">

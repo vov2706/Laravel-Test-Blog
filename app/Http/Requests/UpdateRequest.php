@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\UpdateRequest;
 
-class StoreRequest extends UpdateRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +23,10 @@ class StoreRequest extends UpdateRequest
      */
     public function rules()
     {
-        $rules = parent::rules();
-        $rules['tags'] = ['required'];
-        $rules['image'] = ['required', 'image'];
-
-        return $rules;
+        return [
+            'title' => ['required', 'string'],
+            'description' => ['required', 'string'],
+            'is_active' => ['boolean']
+        ];
     }
 }
