@@ -6,7 +6,7 @@
         <div class="d-flex flex-column mt-5">
             @if($articles)
                 @foreach($articles as $article)
-                    <div class="card mb-3 mx-auto" style="max-width: 540px;">
+                    <div class="card mb-3 mx-auto" style="width: 540px;">
                         <div class="row g-0">
                             <div class="col-md-5">
                                 <img
@@ -16,7 +16,6 @@
                                     width="350"
                                 />
                             </div>
-                            <!-- <p>{{gettype($article->image)}}</p> -->
                             <div class="col-md-7">
                                 <div class="card-body float-left">
                                     <a href="{{ route('articles.show', ['article' => $article]) }}">
@@ -30,6 +29,9 @@
                         </div>
                     </div>
                 @endforeach
+            @endif
+            @if(count($articles) <= 0)
+                <p class="mx-auto" style="font-size: 1.8em;">Актуальних новин ще немає.</p>
             @endif
         </div>
     </div>

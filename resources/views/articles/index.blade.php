@@ -7,6 +7,32 @@
 @stop
 
 @section('content')
+    <!-- Start modal -->
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold" style="font-size: 2em;" id="exampleModalLongTitle">Видалення статті</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="font-size:1.8em;">
+                    Ви впевнені, що хочете видалити цю статтю?
+                </div>
+                <div class="modal-footer" style="font-size:1.4em;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Відмінити</button>
+                    <form action="/dashboard/articles" method="POST" id="deleteForm">
+                    @csrf
+                    @method('delete')
+                        <button type="submit" class="btn btn-primary">Видалити</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End modal -->
+
     <table id="articles" class="display" style="width:100%">
         <thead>
             <tr>
@@ -38,9 +64,7 @@
                             </a>
                         </td>
                         <td>
-                            <a href="{{ route('articles.destroy', ['article' => $article]) }}">
-                                <btn class="btn btn-danger"> Видалити </btn>
-                            </a>
+                            <button class="btn btn-danger delete" id="deleteBtn" value="{{ $article->id }}">Видалити</button>
                         </td>
                     </tr>
                 @endforeach
@@ -58,7 +82,16 @@
     <script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#articles').DataTable();
-        } );
-    </script>    
+            var table = $('#articles').DataTable();
+
+            var deleteBtns = $('.delete')
+                deleteBtns.each(function(index, btn) {
+                    $(btn).on("click",function () { 
+                        console.log(btn.value)
+                        $('#deleteForm').attr('action', `/dashboard/articles/${btn.value}`)
+                        $('#modal').modal('show');
+                    })
+                })
+        });
+    </script>  
 @stop

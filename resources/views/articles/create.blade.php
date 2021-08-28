@@ -3,23 +3,27 @@
 @section('title', $title)
 
 @section('content_header')
-    <h1 class="content-header-title">Створення статті</h1>
-    @if ($errors->any() || isset($errorTags))
+    <h1 class="content-header-title">{{ isset($article->id) ? 'Редагування статті' : 'Створення статті' }}</h1>
+    @if ($errors->any())
         <div class="alert alert-danger" style="font-size: 1.6em"> 
             <ul>
-                @if(isset($errorTags))
-                    <li>Ви не можете додати тег(и) - {{ implode(', ', $errorTags) }}, так як вони не є унікальними.</li>
-                @endif
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
     @endif
+    @if (isset($errorTags))
+        <div class="alert alert-danger" style="font-size: 1.6em"> 
+            <ul>
+                <li>{{ $errorTags }}</li>
+            </ul>
+        </div>
+    @endif
 @stop
 
 @section('content')
-    <form action="{{ isset($article->id) ? route('articles.update', ['article' => $article]) : route('articles.store') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ isset($article->id) ? route('articles.update', ['article' => $article]) : route('articles.store') }}" method="post" enctype="multipart/form-data" class="create-form">
         <div class="form-group">
             <label for="title">Заголовок</label>
             <input type="title" 
@@ -38,6 +42,7 @@
                 class="form-control-file" 
                 id="image"
                 name="image"
+                {{ (!isset($article->id)) ? 'required' : '' }}
             >
 
             @if(isset($article->image))
@@ -60,8 +65,9 @@
                 class="form-control form-elem w-50" 
                 id="tags" 
                 name="tags"
-                placeholder="спорт,політика,forbes"
+                placeholder="спорт, політика, forbes"
                 value="{{ isset($tags) ? implode(', ', $tags) : old('tags') }}"
+                required
             >
             @if(isset($tags))
                 <div class="mt-3">
@@ -71,10 +77,10 @@
         </div>
         <div class="form-group">
             <label for="description">Текст статті</label>
-            <textarea class="form-control form-elem w-25" 
+            <textarea class="form-control form-elem w-50" 
                 id="description" 
                 name="description"
-                rows="3"
+                rows="10"
                 value="{{ old('description') }}"
             >
             {{ isset($article->description) ? $article->description : old('description')}}

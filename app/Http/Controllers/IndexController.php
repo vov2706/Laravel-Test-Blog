@@ -13,8 +13,6 @@ class IndexController extends Controller
             ->latest()
             ->paginate(10);
 
-        // dd($articles);
-
         return view('home.index', compact('articles'));
     }
 

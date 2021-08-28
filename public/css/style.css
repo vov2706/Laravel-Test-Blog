@@ -73,7 +73,7 @@ body {
     Form elements
 ***************************/
 
-form {
+.create-form {
     font-size: 1.5em;
 }
 
@@ -90,7 +90,7 @@ form label{
     height: 20px;
 }
 
-form button {
+.create-form button {
     width: 130px;
     height: 60px;
 }
