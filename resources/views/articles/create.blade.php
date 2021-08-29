@@ -60,7 +60,7 @@
 
         </div>
         <div class="form-group">
-            <label for="tags">Теги(розділяти комою ', ')</label>
+            <label for="tags">Теги(розділяти комою і пробілом: ', ')</label>
             <input type="title" 
                 class="form-control form-elem w-50" 
                 id="tags" 
@@ -82,9 +82,7 @@
                 name="description"
                 rows="10"
                 value="{{ old('description') }}"
-            >
-            {{ isset($article->description) ? $article->description : old('description')}}
-            </textarea>
+            >{{ isset($article->description) ? $article->description : old('description')}}</textarea>
         </div>
         <div class="form-check">
             <input type="checkbox" 

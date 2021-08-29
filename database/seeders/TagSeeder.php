@@ -18,14 +18,19 @@ class TagSeeder extends Seeder
         Tag::factory()->count(180)->create();
 
         $tags = Tag::all();
-        $articlesDescriptions = Article::pluck('description');
+        $articles = Article::all();
 
-        // foreach ($tags as $tag) {
-        //     foreach ($articlesDescriptions as $description) {
-        //         if (strpos($description, $tag->name) !== false) {
-        //             str_replace($tag->name, "<a href='#'>$tag->name</a>", $description);
-        //         }
-        //     }
-        // }
+        foreach ($tags as $tag) {
+            foreach ($articles as $article) {
+                if (preg_match("/\b$tag->name\b/i", strip_tags($article->description))) {
+                    if (strpos($article->description, "<a href='/articles/$tag->article_id'>$tag->name</a>") === false) {
+                        $newDescription = preg_replace("/\b$tag->name\b/", "<a href='/articles/$tag->article_id'>$tag->name</a>", $article->description);
+                        $article->description = $newDescription;
+                        $article->save();
+                    }
+                }
+            }
+        }
+        
     }
 }
