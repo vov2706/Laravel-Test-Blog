@@ -45,17 +45,17 @@ class ArticlesController extends Controller
     {
         $data = $request->validated();
 
-        if ($result = array_intersect(explode(', ', $request->get('tags')), Tag::pluck('name')->toArray())) {
+        if ($result = array_intersect($request->get('tags'), Tag::pluck('name')->toArray())) {
             $request->flash();
             return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Ви не можете додати тег(и) - '.implode(', ', $result).', так як вони не є унікальними.']);
         }
 
         if ($request->has('tags')) {
-            $tags = explode(', ', $request->get('tags'));
+            $tags = $request->get('tags');
             foreach ($tags as $tag) {
                 if (mb_strlen($tag, 'UTF-8') <= 1) {
                     $request->flash();
-                    return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Теги не можуть складатися тільки з однієї-двох літер.']);
+                    return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Теги не можуть складатися тільки з однієї літери.']);
                 }
 
                 if (str_word_count($tag, 0, "АаБбВвГгДдЕеЄєЁёЖжЗзИиІіЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯяЇї") > 1) {
@@ -102,7 +102,7 @@ class ArticlesController extends Controller
         $allArticles = Article::where('id', '!=', $article->id)->get();
 
         // Get tags
-        foreach (explode(', ', $request->get('tags')) as $tag) {
+        foreach ($request->get('tags') as $tag) {
             $newTag = Tag::create([
                 'name' => $tag,
                 'article_id' => $article->id
@@ -160,10 +160,9 @@ class ArticlesController extends Controller
         // Work with tags
         if ($request->has('tags')) {
             
-            
             $articleTags = $article->tags()->pluck('name')->toArray();
-            $updatedTags = explode(', ',$request->tags);
-            $descriptions = Article::where('id', '!=', $id)->get();
+            $updatedTags = $request->tags;
+            $articles = Article::where('id', '!=', $id)->get();
 
             // If adding new tags
             if ($arr = array_diff($updatedTags, $articleTags)) {
@@ -186,7 +185,7 @@ class ArticlesController extends Controller
                         'name' => $tag,
                         'article_id' => $id
                     ]);
-                    $this->changeDescriptions($descriptions, $newTag);
+                    $this->changeDescriptions($articles, $newTag);
                 }
             }
 
@@ -195,7 +194,7 @@ class ArticlesController extends Controller
                 $tags = Tag::whereIn('name', $arr);
                 $tag = $tags->get();
                 $tags->delete();
-                $this->changeDescriptions($descriptions, $tag, false);
+                $this->changeDescriptions($articles, $tag, false);
             }
         }
 
@@ -235,6 +234,38 @@ class ArticlesController extends Controller
         return redirect()->route('articles.edit', ['article' => $article]);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $article = Article::findOrFail($id);
+
+        $img = json_decode($article->image);
+        $tags = $article->tags;
+        $article->delete();
+
+        if (file_exists(public_path().'/images/'.$img->mini)) {
+            unlink(public_path().'/images/'.$img->mini);
+        }
+
+        if (file_exists(public_path().'/images/'.$img->max)) {
+            unlink(public_path().'/images/'.$img->max);
+        }
+
+        if (file_exists(public_path().'/images/'.$img->path)) {
+            unlink(public_path().'/images/'.$img->path);
+        }
+
+        $articles = Article::all();
+        $this->changeDescriptions($articles, $tags, false);
+
+        return redirect()->route('articles.index');
+    }
+
     public function changeDescriptions($arr, $tag, $is_create = true)
     {
         if ($is_create !== false) {
@@ -258,36 +289,5 @@ class ArticlesController extends Controller
                 }
             }
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $article = Article::findOrFail($id);
-
-        $img = json_decode($article->image);
-
-        $article->delete();
-
-        if (file_exists(public_path().'/images/'.$img->mini)) {
-            unlink(public_path().'/images/'.$img->mini);
-        }
-
-        if (file_exists(public_path().'/images/'.$img->max)) {
-            unlink(public_path().'/images/'.$img->max);
-        }
-
-        if (file_exists(public_path().'/images/'.$img->path)) {
-            unlink(public_path().'/images/'.$img->path);
-        }
-
-        $articles = Article::all();
-
-        return redirect()->route('articles.index', compact('articles'));
     }
 }
