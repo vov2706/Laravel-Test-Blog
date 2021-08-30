@@ -8,7 +8,10 @@
             </div>       
             <h1 class="">{{ $article->title }}</h1>
             <p class="text-muted" style="font-size: 1.2em">{{ $article->created_at->format('Y-m-d, h:i') }}</p>
-            <p><img src="/images/{{ $article->image->max }}" alt="Article image" class="col-md-8 float-left m-1">
+            <p>
+                @if(isset($article->image))
+                <img src="/images/{{ $article->image->max }}" alt="Article image" class="col-md-8 float-left m-1">
+                @endif
                 {!! $article->description !!}
             </p>
             <div class="w-75 d-flex justify-content-between position-absolute mx-auto mt-3" style="height: 50px; bottom: 0; left: 15%;">

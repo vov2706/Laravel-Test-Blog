@@ -22,9 +22,9 @@ class TagSeeder extends Seeder
 
         foreach ($tags as $tag) {
             foreach ($articles as $article) {
-                if (preg_match("/\b$tag->name\b/i", strip_tags($article->description))) {
-                    if (strpos($article->description, "<a href='/articles/$tag->article_id'>$tag->name</a>") === false) {
-                        $newDescription = preg_replace("/\b$tag->name\b/", "<a href='/articles/$tag->article_id'>$tag->name</a>", $article->description);
+                if (preg_match("/\b$tag->name\b/u", strip_tags($article->description))) {
+                    if (strpos($article->description, '<a href="/articles/' . $tag->article_id . '">' . $tag->name . '</a>') === false) {
+                        $newDescription = preg_replace("/\b$tag->name\b/u", '<a href="/articles/' . $tag->article_id . '">' . $tag->name . '</a>', $article->description);
                         $article->description = $newDescription;
                         $article->save();
                     }

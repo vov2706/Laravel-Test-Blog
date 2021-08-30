@@ -23,9 +23,11 @@ class UpdateRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $this->merge([
-            'tags' => explode(', ', $this->input('tags')),
-        ]);
+        if ($this->input('tags')) {
+            $this->merge([
+                'tags' => explode(', ', $this->input('tags')),
+            ]);
+        }
     }
 
     /**
@@ -38,8 +40,7 @@ class UpdateRequest extends FormRequest
         return [
             'title' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'tags' => ['required'],
-            'is_active' => ['boolean']
+            'is_active' => ['boolean'],
         ];
     }
 
@@ -52,10 +53,9 @@ class UpdateRequest extends FormRequest
     {
         return [
             'title.required' => "Поле для назви статті є обов'язковим для заповнення.",
-            'tags.required' => "Поле для тегів є обов'язковим для заповнення.",
             'description.required' => "Поле для тексту статті є обов'язковим для заповнення.",
             'title.string' => "Поле для назви статті повинно бути текстом.",
-            'description.string' => "Поле для тексту статті повинно бути текстом",
+            'description.string' => "Поле для тексту статті повинно бути текстом",            
         ];
     }
 

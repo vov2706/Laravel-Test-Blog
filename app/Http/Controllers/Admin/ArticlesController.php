@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Article;
 use App\Models\Tag;
@@ -45,24 +44,21 @@ class ArticlesController extends Controller
     {
         $data = $request->validated();
 
-        if ($result = array_intersect($request->get('tags'), Tag::pluck('name')->toArray())) {
-            $request->flash();
-            return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Ви не можете додати тег(и) - '.implode(', ', $result).', так як вони не є унікальними.']);
-        }
-
         if ($request->has('tags')) {
-            $tags = $request->get('tags');
-            foreach ($tags as $tag) {
-                if (mb_strlen($tag, 'UTF-8') <= 1) {
-                    $request->flash();
-                    return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Теги не можуть складатися тільки з однієї літери.']);
-                }
+            if (is_array($request->get('tags'))) {
+                $tags = $request->get('tags');
+                foreach ($tags as $tag) {
+                    if (mb_strlen($tag, 'UTF-8') <= 1) {
+                        $request->flash();
+                        return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Теги не можуть складатися тільки з однієї літери.']);
+                    }
 
-                if (str_word_count($tag, 0, "АаБбВвГгДдЕеЄєЁёЖжЗзИиІіЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯяЇї") > 1) {
-                    $request->flash();
-                    return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Теги повинні складатися тільки з одного слова.']);
+                    if (str_word_count($tag, 0, "АаБбВвГгДдЕеЄєЁёЖжЗзИиІіЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯяЇї") > 1) {
+                        $request->flash();
+                        return view('articles.create', ['title' => 'Додавання нової статті', 'errorTags' => 'Теги повинні складатися тільки з одного слова.']);
+                    }
                 }
-            }
+            }    
         }
 
         // Make images with different parameters
@@ -92,8 +88,8 @@ class ArticlesController extends Controller
         $allTags = Tag::all();
         $newDescription = ''; 
         foreach ($allTags as $tag) {
-            if (preg_match("/\b$tag->name\b/i", strip_tags($data['description']))) {
-                $newDescription = preg_replace("/\b$tag->name\b/", "<a href='/articles/$tag->article_id'>$tag->name</a>", $data['description']);
+            if (preg_match("/\b$tag->name\b/u", strip_tags($data['description']))) {
+                $newDescription = preg_replace("/\b$tag->name\b/u", '<a href="/articles/' . $tag->article_id . '">' . $tag->name . '</a>', $data['description']);
                 $data['description'] = $newDescription;
             }
         }
@@ -102,12 +98,16 @@ class ArticlesController extends Controller
         $allArticles = Article::where('id', '!=', $article->id)->get();
 
         // Get tags
-        foreach ($request->get('tags') as $tag) {
-            $newTag = Tag::create([
-                'name' => $tag,
-                'article_id' => $article->id
-            ]);
-            $this->changeDescriptions($allArticles, $newTag);
+        if ($request->has('tags')) {
+            if (is_array($request->get('tags'))) {
+                foreach ($request->get('tags') as $tag) {
+                    $newTag = Tag::create([
+                        'name' => $tag,
+                        'article_id' => $article->id
+                    ]);
+                    $this->changeDescriptions($allArticles, $newTag);
+                }
+            }
         }
 
         return redirect()->route('articles.index');
@@ -149,9 +149,9 @@ class ArticlesController extends Controller
         $allTags = Tag::whereNotIn('id', $article->tags()->pluck('id')->toArray())->get();
         $newDescription = ''; 
         foreach ($allTags as $tag) {
-            if (preg_match("/\b$tag->name\b/i", strip_tags($data['description']))) {
-                if (strpos($data['description'], "<a href='/articles/$tag->article_id'>$tag->name</a>") === false) {
-                    $newDescription = preg_replace("/\b$tag->name\b/", "<a href='/articles/$tag->article_id'>$tag->name</a>", $data['description']);
+            if (preg_match("/\b$tag->name\b/u", strip_tags($data['description']))) {
+                if (strpos($data['description'], '<a href="/articles/' . $tag->article_id . '">' . $tag->name . '</a>') === false) {
+                    $newDescription = preg_replace("/\b$tag->name\b/u", '<a href="/articles/' . $tag->article_id . '">' . $tag->name . '</a>', $data['description']);
                     $data['description'] = $newDescription;
                 } 
             }
@@ -159,42 +159,43 @@ class ArticlesController extends Controller
 
         // Work with tags
         if ($request->has('tags')) {
-            
-            $articleTags = $article->tags()->pluck('name')->toArray();
-            $updatedTags = $request->tags;
-            $articles = Article::where('id', '!=', $id)->get();
+            if (is_array($request->get('tags'))) {
+                $articleTags = $article->tags()->pluck('name')->toArray();
+                $updatedTags = $request->get('tags');
+                $articles = Article::where('id', '!=', $id)->get();
 
-            // If adding new tags
-            if ($arr = array_diff($updatedTags, $articleTags)) {
-                if ($result = array_intersect($arr, Tag::pluck('name')->toArray())) {
-                    return view('articles.create', ['errorTags' => $result, 'article' => $article, 'title' => 'Редагування статті', 'tags' => $articleTags]);
-                }
-
-                foreach ($arr as $tag) {
-                    if (mb_strlen($tag, 'UTF-8') <= 1) {
-                        return view('articles.create', ['title' => 'Редагування статті', 'article' => $article, 'tags' => $articleTags, 'errorTags' => 'Теги не можуть складатися тільки з однієї-двох літер.']);
+                // If adding new tags
+                if ($arr = array_diff($updatedTags, $articleTags)) {
+                    if ($result = array_intersect($arr, Tag::pluck('name')->toArray())) {
+                        return view('articles.create', ['errorTags' => $result, 'article' => $article, 'title' => 'Редагування статті', 'tags' => $articleTags]);
                     }
 
-                    if (str_word_count($tag, 0, "АаБбВвГгДдЕеЄєЁёЖжЗзИиІіЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯяЇї") > 1) {
-                        return view('articles.create', ['title' => 'Редагування статті', 'article' => $article, 'tags' => $articleTags, 'errorTags' => 'Теги повинні складатися тільки з одного слова.']);
+                    foreach ($arr as $tag) {
+                        if (mb_strlen($tag, 'UTF-8') <= 1) {
+                            return view('articles.create', ['title' => 'Редагування статті', 'article' => $article, 'tags' => $articleTags, 'errorTags' => 'Теги не можуть складатися тільки з однієї-двох літер.']);
+                        }
+
+                        if (str_word_count($tag, 0, "АаБбВвГгДдЕеЄєЁёЖжЗзИиІіЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯяЇї") > 1) {
+                            return view('articles.create', ['title' => 'Редагування статті', 'article' => $article, 'tags' => $articleTags, 'errorTags' => 'Теги повинні складатися тільки з одного слова.']);
+                        }
+                    }
+
+                    foreach ($arr as $tag) {
+                        $newTag = Tag::create([
+                            'name' => $tag,
+                            'article_id' => $id
+                        ]);
+                        $this->changeDescriptions($articles, $newTag);
                     }
                 }
 
-                foreach ($arr as $tag) {
-                    $newTag = Tag::create([
-                        'name' => $tag,
-                        'article_id' => $id
-                    ]);
-                    $this->changeDescriptions($articles, $newTag);
+                // If deleting tags
+                if ($arr = array_diff($articleTags, $updatedTags)) {
+                    $tags = Tag::whereIn('name', $arr);
+                    $tag = $tags->get();
+                    $tags->delete();
+                    $this->changeDescriptions($articles, $tag, false);
                 }
-            }
-
-            // If deleting tags
-            if ($arr = array_diff($articleTags, $updatedTags)) {
-                $tags = Tag::whereIn('name', $arr);
-                $tag = $tags->get();
-                $tags->delete();
-                $this->changeDescriptions($articles, $tag, false);
             }
         }
 
@@ -244,21 +245,27 @@ class ArticlesController extends Controller
     {
         $article = Article::findOrFail($id);
 
-        $img = json_decode($article->image);
+        if (isset($article->image)) {
+            $img = json_decode($article->image);
+        }
+        
         $tags = $article->tags;
         $article->delete();
-
-        if (file_exists(public_path().'/images/'.$img->mini)) {
-            unlink(public_path().'/images/'.$img->mini);
+        
+        if (isset($img)) {
+            if (file_exists(public_path().'/images/'.$img->mini)) {
+                unlink(public_path().'/images/'.$img->mini);
+            }
+    
+            if (file_exists(public_path().'/images/'.$img->max)) {
+                unlink(public_path().'/images/'.$img->max);
+            }
+    
+            if (file_exists(public_path().'/images/'.$img->path)) {
+                unlink(public_path().'/images/'.$img->path);
+            }
         }
-
-        if (file_exists(public_path().'/images/'.$img->max)) {
-            unlink(public_path().'/images/'.$img->max);
-        }
-
-        if (file_exists(public_path().'/images/'.$img->path)) {
-            unlink(public_path().'/images/'.$img->path);
-        }
+       
 
         $articles = Article::all();
         $this->changeDescriptions($articles, $tags, false);
@@ -266,13 +273,14 @@ class ArticlesController extends Controller
         return redirect()->route('articles.index');
     }
 
+    // Change descriptions(add links on tags)
     public function changeDescriptions($arr, $tag, $is_create = true)
     {
         if ($is_create !== false) {
             foreach ($arr as $article) {
-                if (preg_match("/\b$tag->name\b/i", strip_tags($article->description))) {
-                    if (strpos($article->description, "<a href='/articles/$tag->article_id'>$tag->name</a>") === false) {
-                        $newDescription = preg_replace("/\b$tag->name\b/", "<a href='/articles/$tag->article_id'>$tag->name</a>", $article->description);
+                if (preg_match("/\b$tag->name\b/u", strip_tags($article->description))) {
+                    if (strpos($article->description, '<a href="/articles/' . $tag->article_id . '">' . $tag->name .'</a>') === false) {
+                        $newDescription = preg_replace("/\b$tag->name\b/u", '<a href="/articles/' . $tag->article_id . '">' . $tag->name .'</a>', $article->description);
                         $article->description = $newDescription;
                         $article->save();
                     }
@@ -281,8 +289,8 @@ class ArticlesController extends Controller
         } else {
             foreach ($tag as $t) {
                 foreach ($arr as $article) {
-                    if (strpos($article->description, "<a href='/articles/$t->article_id'>$t->name</a>") !== false) {
-                        $newDescription = str_replace("<a href='/articles/$t->article_id'>$t->name</a>", $t->name, $article->description);
+                    if (strpos($article->description, '<a href="/articles/' . $t->article_id . '">' . $t->name .'</a>') !== false) {
+                        $newDescription = str_replace('<a href="/articles/' . $t->article_id . '">' . $t->name .'</a>', $t->name, $article->description);
                         $article->description = $newDescription;
                         $article->save();
                     }
