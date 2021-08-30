@@ -19,8 +19,6 @@ use App\Http\Controllers\Admin\AdminController;
 Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::get('/articles/{article}', [IndexController::class, 'show'])->name('articles.show');
 
-// Route::resource('articles', ArticlesController::class);
-
 Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::resource('articles', ArticlesController::class)->except('show');

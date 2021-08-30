@@ -24,9 +24,11 @@ class StoreRequest extends UpdateRequest
      */
     protected function prepareForValidation()
     {
-        $this->merge([
-            'tags' => explode(', ', $this->input('tags')),
-        ]);
+        if ($this->input('tags')) {
+            $this->merge([
+                'tags' => explode(', ', $this->input('tags')),
+            ]);
+        }
     }
 
     /**
@@ -37,7 +39,7 @@ class StoreRequest extends UpdateRequest
     public function rules()
     {
         $rules = parent::rules();
-        $rules['image'] = ['required', 'image'];
+        $rules['image'] = ['image'];
         $rules['tags.*'] = ['unique:tags,name'];
 
         return $rules;

@@ -42,7 +42,6 @@
                 class="form-control-file" 
                 id="image"
                 name="image"
-                {{ (!isset($article->id)) ? 'required' : '' }}
             >
 
             @if(isset($article->image))
@@ -67,7 +66,6 @@
                 name="tags"
                 placeholder="спорт, політика, forbes"
                 value="{{ isset($tags) ? implode(', ', $tags) : old('tags') }}"
-                required
             >
             @if(isset($tags))
                 <div class="mt-3">
@@ -106,5 +104,8 @@
 @stop
 
 @section('js')
-    
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace( 'description' );
+    </script>
 @stop

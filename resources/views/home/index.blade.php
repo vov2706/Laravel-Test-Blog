@@ -10,10 +10,9 @@
                         <div class="row g-0">
                             <div class="col-md-5">
                                 <img
-                                    src="/images/{{json_decode($article->image)->path}}" 
+                                    src="{{ isset($article->image) ? '/images/' . json_decode($article->image)->path : 'https://via.placeholder.com/210x155' }}" 
                                     alt="Article image"
                                     class="img-fluid"
-                                    width="350"
                                 />
                             </div>
                             <div class="col-md-7">

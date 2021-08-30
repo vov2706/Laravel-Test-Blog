@@ -49,11 +49,15 @@
                 @foreach($articles as $article)
                     <tr>
                         <td>
-                            <img src="/images/{{ json_decode($article->image)->mini }}"
-                                alt="Article image"
-                                width="100"
-                                height="75"
-                            />
+                            @if(isset($article->image))
+                                <img src="/images/{{ json_decode($article->image)->mini }}"
+                                    alt="Article image"
+                                    width="100"
+                                    height="75"
+                                />
+                            @else 
+                            Фото статті немає
+                            @endif
                         </td>
                         <td>{{ $article->title }}</td>
                         <td>{{ $article->created_at->format('Y-m-d, h:i') }}</td>
